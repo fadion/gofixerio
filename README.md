@@ -52,12 +52,12 @@ fmt.Println(rates)
 the response will be the map:
 
 ```go
-map[USD:1.1188 USD:0.87093]
+map[USD:1.1188 GBP:0.87093]
 ```
 
 which you can access with the keys as strings or using the currency constants:
 
 ```go
-rates["EUR"];
+rates["USD"];
 rates[gofixerio.GBP];
 ```
