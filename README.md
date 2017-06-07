@@ -43,7 +43,7 @@ The response is a simple `map[string]float32` with currencies as keys and ratios
 
 ```go
 exchange := gofixerio.New()
-exchange.Symbols(gofixerio.USD, gofixerio.BGP)
+exchange.Symbols(gofixerio.USD, gofixerio.GBP)
 
 rates, _ := exchange.GetRates()
 fmt.Println(rates)
