@@ -1,3 +1,7 @@
+/*
+	Package Fixerio provides a simple interface to the
+	fixer.io API, a service for currency exchange rates.
+ */
 package fixerio
 
 import (
@@ -37,7 +41,7 @@ func New() *request {
 	}
 }
 
-// Set base currency.
+// Sets base currency.
 func (f *request) Base(currency string) {
 	f.base = currency
 }
@@ -80,6 +84,7 @@ func (f *request) GetRates() (rates, error) {
 	return response, nil
 }
 
+// Formats the URL correctly for the API request.
 func (f *request) buildUrl() string {
 	var url bytes.Buffer
 
