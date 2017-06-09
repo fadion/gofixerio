@@ -23,15 +23,15 @@ import "github.com/fadion/gofixerio"
 Let's see an exhaustive example with all the parameters:
 
 ```go
-exchange := gofixerio.New()
+exchange := fixerio.New()
 
-exchange.Base(gofixerio.EUR)
-exchange.Symbols(gofixerio.USD, gofixerio.AUD)
+exchange.Base(fixerio.EUR)
+exchange.Symbols(fixerio.USD, fixerio.AUD)
 exchange.Secure(true)
 exchange.Historical(time.Date(2016, time.December, 15, 0, 0, 0, 0, time.UTC))
 
 if rates, err := exchange.GetRates(); err == nil {
-    fmt.Println(rates[gofixerio.USD])
+    fmt.Println(rates[fixerio.USD])
 }
 ```
 
@@ -42,8 +42,8 @@ Every parameter can be omitted as the package provides some sensible defaults. T
 The response is a simple `map[string]float32` with currencies as keys and ratios as values. For a request like the following:
 
 ```go
-exchange := gofixerio.New()
-exchange.Symbols(gofixerio.USD, gofixerio.GBP)
+exchange := fixerio.New()
+exchange.Symbols(fixerio.USD, fixerio.GBP)
 
 rates, _ := exchange.GetRates()
 fmt.Println(rates)
@@ -59,5 +59,5 @@ which you can access with the keys as strings or using the currency constants:
 
 ```go
 rates["USD"];
-rates[gofixerio.GBP];
+rates[fixerio.GBP];
 ```
