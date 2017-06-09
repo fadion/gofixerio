@@ -68,7 +68,7 @@ func (f *request) Historical(date time.Time) {
 
 // Retrieve the exchange rates.
 func (f *request) GetRates() (rates, error) {
-	url := f.buildUrl()
+	url := f.GetUrl()
 	body, err := f.makeRequest(url)
 
 	if err != nil {
@@ -85,7 +85,7 @@ func (f *request) GetRates() (rates, error) {
 }
 
 // Formats the URL correctly for the API request.
-func (f *request) buildUrl() string {
+func (f *request) GetUrl() string {
 	var url bytes.Buffer
 
 	url.WriteString(f.protocol)
