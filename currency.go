@@ -1,4 +1,4 @@
-package gofixerio
+package fixerio
 
 const (
     AUD = "AUD"

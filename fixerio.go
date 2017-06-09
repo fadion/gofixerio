@@ -1,4 +1,4 @@
-package gofixerio
+package fixerio
 
 import (
     "strings"
@@ -10,7 +10,7 @@ import (
     "errors"
 )
 
-type fixerio struct {
+type request struct {
     base     string
     protocol string
     date     string
@@ -28,8 +28,8 @@ type rates map[string]float32
 var baseUrl = "api.fixer.io"
 
 // Initializes fixerio.
-func New() *fixerio {
-    return &fixerio{
+func New() *request {
+    return &request{
         base:     EUR,
         protocol: "https",
         date:     "",
@@ -38,13 +38,13 @@ func New() *fixerio {
 }
 
 // Set base currency.
-func (f *fixerio) Base(currency string) {
+func (f *request) Base(currency string) {
     f.base = currency
 }
 
 // Make the connection secure or not by setting the
 // secure argument to true or false.
-func (f *fixerio) Secure(secure bool) {
+func (f *request) Secure(secure bool) {
     if secure {
         f.protocol = "https"
     } else {
@@ -53,17 +53,17 @@ func (f *fixerio) Secure(secure bool) {
 }
 
 // List of currencies that should be returned.
-func (f *fixerio) Symbols(currencies ...string) {
+func (f *request) Symbols(currencies ...string) {
     f.symbols = currencies
 }
 
 // Specify a date in the past to retrieve historical records.
-func (f *fixerio) Historical(date time.Time) {
+func (f *request) Historical(date time.Time) {
     f.date = date.Format("2006-01-02")
 }
 
 // Retrieve the exchange rates.
-func (f *fixerio) GetRates() (rates, error) {
+func (f *request) GetRates() (rates, error) {
     url := f.buildUrl()
     body, err := f.makeRequest(url)
 
@@ -80,7 +80,7 @@ func (f *fixerio) GetRates() (rates, error) {
     return response, nil
 }
 
-func (f *fixerio) buildUrl() string {
+func (f *request) buildUrl() string {
     var url bytes.Buffer
 
     url.WriteString(f.protocol)
@@ -105,7 +105,7 @@ func (f *fixerio) buildUrl() string {
     return url.String()
 }
 
-func (f *fixerio) makeRequest(url string) (string, error) {
+func (f *request) makeRequest(url string) (string, error) {
     response, err := http.Get(url)
 
     if err != nil {
@@ -122,7 +122,7 @@ func (f *fixerio) makeRequest(url string) (string, error) {
     return string(body), nil
 }
 
-func (f *fixerio) parseJson(body string) (rates, error) {
+func (f *request) parseJson(body string) (rates, error) {
     var response response
 
     err := json.Unmarshal([]byte(body), &response)
