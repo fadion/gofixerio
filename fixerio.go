@@ -7,21 +7,22 @@ package fixerio
 import (
 	"strings"
 	"net/http"
-	"io/ioutil"
 	"encoding/json"
 	"time"
 	"bytes"
 	"errors"
 )
 
-type request struct {
+// Holds the request parameters.
+type Request struct {
 	base     string
 	protocol string
 	date     string
 	symbols  []string
 }
 
-type response struct {
+// JSON response object.
+type Response struct {
 	Base  string `json:"base"`
 	Date  string `json:"date"`
 	Rates rates `json:"rates"`
@@ -32,8 +33,8 @@ type rates map[string]float32
 var baseUrl = "api.fixer.io"
 
 // Initializes fixerio.
-func New() *request {
-	return &request{
+func New() *Request {
+	return &Request{
 		base:     EUR,
 		protocol: "https",
 		date:     "",
@@ -42,13 +43,13 @@ func New() *request {
 }
 
 // Sets base currency.
-func (f *request) Base(currency string) {
+func (f *Request) Base(currency string) {
 	f.base = currency
 }
 
 // Make the connection secure or not by setting the
 // secure argument to true or false.
-func (f *request) Secure(secure bool) {
+func (f *Request) Secure(secure bool) {
 	if secure {
 		f.protocol = "https"
 	} else {
@@ -57,25 +58,19 @@ func (f *request) Secure(secure bool) {
 }
 
 // List of currencies that should be returned.
-func (f *request) Symbols(currencies ...string) {
+func (f *Request) Symbols(currencies ...string) {
 	f.symbols = currencies
 }
 
 // Specify a date in the past to retrieve historical records.
-func (f *request) Historical(date time.Time) {
+func (f *Request) Historical(date time.Time) {
 	f.date = date.Format("2006-01-02")
 }
 
 // Retrieve the exchange rates.
-func (f *request) GetRates() (rates, error) {
+func (f *Request) GetRates() (rates, error) {
 	url := f.GetUrl()
-	body, err := f.makeRequest(url)
-
-	if err != nil {
-		return rates{}, err
-	}
-
-	response, err := f.parseJson(body)
+	response, err := f.makeRequest(url)
 
 	if err != nil {
 		return rates{}, err
@@ -84,8 +79,8 @@ func (f *request) GetRates() (rates, error) {
 	return response, nil
 }
 
-// Formats the URL correctly for the API request.
-func (f *request) GetUrl() string {
+// Formats the URL correctly for the API Request.
+func (f *Request) GetUrl() string {
 	var url bytes.Buffer
 
 	url.WriteString(f.protocol)
@@ -110,30 +105,20 @@ func (f *request) GetUrl() string {
 	return url.String()
 }
 
-func (f *request) makeRequest(url string) (string, error) {
-	response, err := http.Get(url)
+func (f *Request) makeRequest(url string) (rates, error) {
+	var response Response
+	body, err := http.Get(url)
 
 	if err != nil {
-		return "", errors.New("Couldn't connect to server")
+		return rates{}, errors.New("Couldn't connect to server")
 	}
 
-	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
+	defer body.Body.Close()
+
+	err = json.NewDecoder(body.Body).Decode(&response)
 
 	if err != nil {
-		return "", errors.New("Couldn't parse response")
-	}
-
-	return string(body), nil
-}
-
-func (f *request) parseJson(body string) (rates, error) {
-	var response response
-
-	err := json.Unmarshal([]byte(body), &response)
-
-	if err != nil {
-		return rates{}, errors.New("Couldn't parse response")
+		return rates{}, errors.New("Couldn't parse Response")
 	}
 
 	return response.Rates, nil
